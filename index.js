@@ -22,8 +22,8 @@ exports.handler = (event, context, callback) => {
 			});
 		}
 	}; 
-	let {duration} = JSON.parse(event.body)
-	if(event.headers["Authorization"] && duration && !isNaN(duration)){
+	let {score} = JSON.parse(event.body)
+	if(event.headers["Authorization"] && score && !isNaN(score)){
 		context.callbackWaitsForEmptyEventLoop = false;
 		pool.getConnection((err, con) => {
 			const updateSuccessful = () => {
@@ -33,7 +33,7 @@ exports.handler = (event, context, callback) => {
 						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({
-						message: "Update successful",
+						message: "Update successful single-player",
 					}),
 				});
 			}
@@ -48,11 +48,11 @@ exports.handler = (event, context, callback) => {
 			const { "cognito:username": username } = jwt_decode(event.headers["Authorization"]);
 	
 			con.query(`
-			replace into buffer(username, duration, score) 
-			select tmp.username,  if(b.duration > tmp.duration , b.duration, tmp.duration) duration, b.score
-			from buffer b right join (SELECT ? as username, ? as duration) tmp on b.username = tmp.username 
+			replace into buffer(username, score, defeated) 
+			select tmp.username,  if(b.score > tmp.score , b.score, tmp.score) score, b.defeated
+			from buffer b right join (SELECT ? as username, ? as score) tmp on b.username = tmp.username 
 			where tmp.username = ?
-			`, [username, duration, username], function (err, results) {
+			`, [username, score, username], function (err, results) {
 				if(err) errorIfSet(err);
 				else{
 					callback(null, {
@@ -69,6 +69,6 @@ exports.handler = (event, context, callback) => {
 			});
 		});
 	} else {
-		errorIfSet("Authorization token not found or duration is not a number")
+		errorIfSet("Authorization token not found or score is not a number")
 	}
 };

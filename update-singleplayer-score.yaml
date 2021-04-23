@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification template describing your function.
+Resources:
+  updatesingleplayerscore:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      CodeUri: .
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role: >-
+        arn:aws:iam::942766427804:role/service-role/update-singleplayer-score-role-b3eodmyt
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /update-singleplayer-score
+            Method: ANY
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-5befbe2a
+        SubnetIds:
+          - subnet-7fc0b515
+          - subnet-b6cf79fa
+          - subnet-73fe5d0f
+      Environment:
+        Variables:
+          DB_HOST: leaderboard.cb5ij1sosjsb.eu-central-1.rds.amazonaws.com
+          DB_NAME: leaderboard
+          DB_PASSWORD: EverBuilds
+          DB_USER: admin
